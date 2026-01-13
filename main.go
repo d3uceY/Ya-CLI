@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,45 +8,9 @@ import (
 	"pronto/utils"
 )
 
-func loadShortcuts() (map[string]string, error) {
-	data, err := os.ReadFile("shortcuts.json")
-	if err != nil {
-		return nil, err
-	}
-
-	var shortcuts map[string]string
-	err = json.Unmarshal(data, &shortcuts)
-	if err != nil {
-		return nil, err
-	}
-
-	return shortcuts, nil
-}
-
-func addShortcut(name, command string) error {
-	shortcuts, err := loadShortcuts()
-
-	if err != nil {
-		return err
-	}
-
-	shortcuts[name] = command
-
-	data, err := json.MarshalIndent(shortcuts, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	err = os.WriteFile("shortcuts.json", data, 0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
 
 func main() {
-	shortcuts, err := loadShortcuts()
+	shortcuts, err := utils.LoadShortcuts()
 	if err != nil {
 		fmt.Println("Error loading shortcuts:", err)
 		os.Exit(1)
@@ -75,10 +38,10 @@ func main() {
 		shortcutName := os.Args[2]
 		command := os.Args[3]
 		if utils.IsInvalidString(shortcutName) || utils.IsInvalidString(command) {
-			fmt.Println("Usage: pronto add <shortcut> <command>")
+			fmt.Println("Usage: pronto add <shortcut> '<command>'")
 			os.Exit(1)
 		}
-		addShortcut(shortcutName, command)
+		utils.AddShortcut(shortcutName, command)
 		return
 	}
 
