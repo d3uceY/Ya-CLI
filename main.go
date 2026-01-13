@@ -89,14 +89,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	cmd := exec.Command("sh", "-c", command)
+	cmd := exec.Command("powershell", "-Command", command)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 
 	cmdError := cmd.Run()
 	if cmdError != nil {
-		fmt.Println("Command failed:", err)
+		fmt.Println("Command failed:", cmdError)
 		os.Exit(1)
 	}
 }
