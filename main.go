@@ -68,15 +68,18 @@ func main() {
 		}
 		return
 	case "add":
+		if len(os.Args) < 4 {
+			fmt.Println("Usage: pronto add <shortcut> <command>")
+			os.Exit(1)
+		}
 		shortcutName := os.Args[2]
 		command := os.Args[3]
 		if utils.IsInvalidString(shortcutName) || utils.IsInvalidString(command) {
 			fmt.Println("Usage: pronto add <shortcut> <command>")
 			os.Exit(1)
-		} else {
-			addShortcut(shortcutName, command)
-			return
 		}
+		addShortcut(shortcutName, command)
+		return
 	}
 
 	command, exists := shortcuts[shortcut]
@@ -91,8 +94,8 @@ func main() {
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 
-	err := cmd.Run()
-	if err != nil {
+	cmdError := cmd.Run()
+	if cmdError != nil {
 		fmt.Println("Command failed:", err)
 		os.Exit(1)
 	}
