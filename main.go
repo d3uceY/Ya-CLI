@@ -1,9 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/exec"
+
+	"github.com/fatih/color"
 
 	"ya/utils"
 )
@@ -11,12 +12,12 @@ import (
 func main() {
 	shortcuts, err := utils.LoadShortcuts()
 	if err != nil {
-		fmt.Println("Error loading shortcuts:", err)
+		color.Red("Error loading shortcuts:", err)
 		os.Exit(1)
 	}
 
 	if len(os.Args) < 2 {
-		fmt.Println("Usage: ya <shortcut> \n for shortcuts use: ya help")
+		color.Red("Usage: ya <shortcut> \n for shortcuts use: ya help")
 		os.Exit(1)
 	}
 
@@ -24,27 +25,29 @@ func main() {
 
 	switch shortcut {
 	case "help":
-		fmt.Println("Available shortcuts:")
+		color.Green("Available shortcuts:")
 		for key := range shortcuts {
-			fmt.Println(" -", key, ":", shortcuts[key])
+			color.Green(" - %s : %s", key, shortcuts[key])
 		}
+		color.Green("\nTo add a new shortcut use: ya add <shortcut> '<command>'")
+		color.Green("To remove a shortcut use: ya remove <shortcut>")
 		return
 	case "add":
 		if len(os.Args) < 4 {
-			fmt.Println("Usage: ya add <shortcut> '<command>'")
+			color.Red("Usage: ya add <shortcut> '<command>'")
 			os.Exit(1)
 		}
 		shortcutName := os.Args[2]
 		command := os.Args[3]
 		if utils.IsInvalidString(shortcutName) || utils.IsInvalidString(command) {
-			fmt.Println("Usage: ya add <shortcut> '<command>'")
+			color.Red("Usage: ya add <shortcut> '<command>'")
 			os.Exit(1)
 		}
 		utils.AddShortcut(shortcutName, command)
 		return
 	case "remove":
 		if len(os.Args) < 3 {
-			fmt.Println("Usage: ya remove <shortcut>")
+			color.Red("Usage: ya remove <shortcut>")
 			os.Exit(1)
 		}
 		utils.RemoveShortcut(os.Args[2])
@@ -54,7 +57,7 @@ func main() {
 	command, exists := shortcuts[shortcut]
 
 	if !exists {
-		fmt.Printf("Unknown shortcut: %s\n", shortcut+"\n to add a new shortcut use: ya add <shortcut> '<command>'")
+		color.Red("Unknown shortcut: %s\n to add a new shortcut use: ya add <shortcut> '<command>'", shortcut)
 		os.Exit(1)
 	}
 
@@ -65,7 +68,7 @@ func main() {
 
 	cmdError := cmd.Run()
 	if cmdError != nil {
-		fmt.Println("Command failed:", cmdError)
+		color.Red("Command failed: %v", cmdError)
 		os.Exit(1)
 	}
 }
