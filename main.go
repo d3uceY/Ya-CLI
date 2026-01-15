@@ -62,12 +62,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Detect OS and use appropriate shell
+	// if we are here, detect if it is windows, you get?
 	var cmd *exec.Cmd
 	if runtime.GOOS == "windows" {
 		cmd = exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", command)
 	} else {
-		// Linux, macOS, and other Unix-like systems
+		// for linux and macOS typeshit
 		cmd = exec.Command("bash", "-c", command)
 	}
 
