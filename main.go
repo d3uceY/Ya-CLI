@@ -25,6 +25,10 @@ func main() {
 	shortcut := os.Args[1]
 
 	switch shortcut {
+	case "version":
+		version := utils.GetAppVersion()
+		color.Green("Ya version: %s", version)
+		return
 	case "help":
 		color.Green("Available shortcuts:")
 		for key := range shortcuts {

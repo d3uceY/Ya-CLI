@@ -6,6 +6,10 @@ import (
 	"path/filepath"
 )
 
+func GetAppVersion() string {
+	return "v0.2.1"
+}
+
 func getAppDataDir() (string, error) {
 	dir, err := os.UserConfigDir()
 	if err != nil {
