@@ -136,8 +136,10 @@ Move-Item .\ya.exe "C:\Program Files\Ya\ya.exe"
 - 📥 **Import Shortcuts:** Import a set of shortcuts from a JSON file.
 - 🗑️ **Remove Shortcut:** Delete a shortcut by name.
 - ➕ **Pass Extra Arguments:** You can now pass additional arguments to your shortcuts at runtime.
+<img width="550" height="198" alt="image" src="https://github.com/user-attachments/assets/666e368d-b43c-4723-9027-8a26ff9b371e" />
 
 See below for usage examples!
+
 
 ### Managing Shortcuts with GUI
 
@@ -210,7 +212,7 @@ ya ports    # Runs: netstat -ano | findstr LISTENING
 You can append extra arguments when running a shortcut. These will be added to the end of the command.
 
 ```powershell
-ya gcm "Initial commit"
+ya gcm -m "Initial commit"
 # Runs: git commit -m "Initial commit"
 ```
 
