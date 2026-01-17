@@ -23,7 +23,7 @@ A lightweight command-line shortcut manager for Windows. Execute your frequently
 #### 🐧 Linux
 [![Download for Linux](https://img.shields.io/badge/Download-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/d3uceY/Ya-CLI/releases/download/v0.3.0/ya-linux.zip)
 
-> Windows • macOS • Linux | Version 0.2.1
+> Windows • macOS • Linux | Version 0.3.0
 
 
 ## Features
