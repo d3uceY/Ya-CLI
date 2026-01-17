@@ -29,12 +29,20 @@ func main() {
 
 	// Version command
 	case "version", "-v":
+		if len(os.Args) > 2 {
+			color.Red("usage: ya version")
+			os.Exit(1)
+		}
 		version := utils.GetAppVersion()
 		color.Green("Ya version: %s", version)
 		return
 
 	// list command
 	case "list", "-l", "--list":
+		if len(os.Args) > 2 {
+			color.Red("usage: ya list")
+			os.Exit(1)
+		}
 		color.Green("Available shortcuts:")
 		for key, cmd := range shortcuts {
 			color.Yellow(" - %s :", key)
@@ -44,6 +52,10 @@ func main() {
 
 	// Help command
 	case "help", "--help", "-h":
+		if len(os.Args) > 2 {
+			color.Red("usage: ya help")
+			os.Exit(1)
+		}
 		color.Green("\nTo add a new shortcut use: ya add <shortcut> '<command>'")
 		color.Green("To remove a shortcut use: ya remove <shortcut>\n")
 		color.Green("To list all shortcuts : ya list")
@@ -51,17 +63,31 @@ func main() {
 		color.Green("To remove a shortcut use: ya remove <shortcut>")
 		return
 
+	// Search command
 	case "search", "--search":
 		if len(os.Args) > 3 {
 			color.Red("usage: ya search <shortcut>")
+			os.Exit(1)
 		}
-        
+		shortcuts, err := utils.SearchShortcut(os.Args[2])
+		if err != nil {
+			color.Red(err.Error())
+		}
+		if !(len(shortcuts) >= 1) {
+			color.Red("Shortcuts with `%s` not found", os.Args[2])
+		}
+		color.Green("Search results:")
+		for key, cmd := range shortcuts {
+			color.Yellow(" - %s :", key)
+			color.Green(" %s", cmd)
+		}
 		return
 
 	// Show command
 	case "show":
 		if len(os.Args) > 3 {
 			color.Red("usage: ya show <shortcut>")
+			os.Exit(1)
 		}
 		command, err := utils.GetShortcut(os.Args[2])
 		if err != nil {
