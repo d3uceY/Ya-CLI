@@ -105,7 +105,7 @@ func main() {
 			color.Red(err.Error())
 			os.Exit(1)
 		}
-		color.Green("Shortcut `%s` maps to command: %s", os.Args[2], command)
+		fmt.Printf("Shortcut `%s` maps to command: %s\n", yellow(os.Args[2]), green(command))
 		return
 
 	// Add command
