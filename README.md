@@ -1,5 +1,5 @@
 <div align="center">
-    <img src="assets/ya.png" alt="ya logo" />
+    <img src="assets/ya.png" alt="ya logo" height="200px"/>
     <h1>Ya - CLI</h1>
 </div>
 
