@@ -8,6 +8,24 @@ A lightweight command-line shortcut manager for Windows. Execute your frequently
 
 **Name Origin:** "Ya" comes from the Spanish word meaning "right now" - reflecting the instant execution of your commands.
 
+## ⬇️ Download
+![Ya CLI Banner](https://img.shields.io/badge/Made%20with-Go-00ADD8?style=for-the-badge&logo=go)
+![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
+
+### Ya CLI v0.2.1 — Multi-Platform Support
+
+#### 🪟 Windows
+[![Download for Windows](https://img.shields.io/badge/Download-Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/d3uceY/Ya-CLI/releases/download/v0.2.1/ya-windows.zip)
+
+#### 🍎 macOS
+[![Download for macOS](https://img.shields.io/badge/Download-macOS-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/d3uceY/Ya-CLI/releases/download/v0.2.1/ya-macos.zip)
+
+#### 🐧 Linux
+[![Download for Linux](https://img.shields.io/badge/Download-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/d3uceY/Ya-CLI/releases/download/v0.2.1/ya-linux.zip)
+
+> Windows • macOS • Linux | Version 0.2.1
+
+
 ## Features
 
 - 🚀 Create custom shortcuts for long or complex commands
