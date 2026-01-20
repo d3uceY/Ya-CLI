@@ -51,6 +51,15 @@ Supports **Windows**, **Linux**, and **macOS**.
 
 ## Installation
 
+## 🍺 Install with Homebrew (macOS & Linux)
+
+If you have **Homebrew** installed, you can install **Ya** with:
+
+```bash
+brew tap d3uceY/homebrew-ya
+brew install ya
+
+
 ### Prerequisites
 
 - Go 1.25.5 or higher
