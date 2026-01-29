@@ -43,6 +43,7 @@ A lightweight command-line shortcut manager for Windows. Execute your frequently
 - Fast command execution via PowerShell
 - Easy-to-use CLI interface
 - **GUI Available:** Prefer a graphical interface? Check out [Ya-GUI](https://github.com/d3uceY/Ya-GUI) - a modern desktop application for managing your shortcuts visually
+<img  alt="image" src="https://github.com/user-attachments/assets/258c0012-6944-43e7-95ee-a5f147ceca2b" width="100%"/>
 
 ## Platform Support
 
