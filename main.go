@@ -94,7 +94,7 @@ func main() {
 
 	// Show command
 	case "show":
-		if len(os.Args) > 3 {
+		if len(os.Args) > 3 || len(os.Args) < 3 {
 			color.Red("usage: ya show <shortcut>")
 			os.Exit(1)
 		}
