@@ -4,9 +4,11 @@
 </div>
 
 
-A lightweight command-line shortcut manager for Windows. Execute your frequently used PowerShell commands with simple, memorable shortcuts.
+A lightweight command-line shortcut manager. Execute your frequently used PowerShell commands with simple, memorable shortcuts.
 
-![preview-video](https://github.com/user-attachments/assets/8ec0bed7-a6b0-48ec-a642-e9c0a76154f4)
+<div align="center">
+    <img src="https://github.com/user-attachments/assets/8ec0bed7-a6b0-48ec-a642-e9c0a76154f4" />
+</div>
 
 
 
@@ -41,6 +43,7 @@ A lightweight command-line shortcut manager for Windows. Execute your frequently
 - Fast command execution via PowerShell
 - Easy-to-use CLI interface
 - **GUI Available:** Prefer a graphical interface? Check out [Ya-GUI](https://github.com/d3uceY/Ya-GUI) - a modern desktop application for managing your shortcuts visually
+<img  alt="image" src="https://github.com/user-attachments/assets/258c0012-6944-43e7-95ee-a5f147ceca2b" width="100%"/>
 
 ## Platform Support
 
