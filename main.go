@@ -40,6 +40,14 @@ func main() {
 				os.Exit(1)
 			}
 
+			// if the command has {placeholder} tokens, prompt the user to fill them in
+			var templateErr error
+			command, templateErr = utils.ResolveTemplates(command)
+			if templateErr != nil {
+				color.Red("Template error: %v", templateErr)
+				os.Exit(1)
+			}
+
 			// i added this because i was wondering how i would have been using this
 			// this allows arguments passing the shortcut commands to also pass messages like git commit -m 'message'
 			if len(args) > 1 {

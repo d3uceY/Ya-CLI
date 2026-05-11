@@ -1,10 +1,12 @@
 package utils
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"github.com/fatih/color"
@@ -12,7 +14,7 @@ import (
 
 // i go need explain myself? 😭
 func GetAppVersion() string {
-	return "v0.3.2"
+	return "v0.3.3"
 }
 
 // i think you should know what this one does
@@ -241,4 +243,61 @@ func ExportShortcuts(filepath string) error {
 		return err
 	}
 	return nil
+}
+
+// ResolveTemplates finds all {placeholder} tokens in a command string,
+// prompts the user to fill in each one interactively, and returns the resolved command.
+// e.g. "git commit -m {message}" → prompts for "message" → "git commit -m 'my message'"
+func ResolveTemplates(command string) (string, error) {
+	// find all unique placeholders like {name}, {commit}, etc.
+	re := regexp.MustCompile(`\{([^}]+)\}`)
+	matches := re.FindAllStringSubmatch(command, -1)
+
+	if len(matches) == 0 {
+		// no templates, nothing to do
+		return command, nil
+	}
+
+	// deduplicate while preserving order so we only prompt once per unique placeholder
+	seen := map[string]bool{}
+	var placeholders []string
+	for _, m := range matches {
+		if !seen[m[1]] {
+			seen[m[1]] = true
+			placeholders = append(placeholders, m[1])
+		}
+	}
+
+	cyan := color.New(color.FgCyan).SprintFunc()
+	yellow := color.New(color.FgYellow).SprintFunc()
+	green := color.New(color.FgGreen).SprintFunc()
+
+	fmt.Printf("%s %s\n", cyan("→"), yellow("This command has template values. Fill them in below:"))
+	fmt.Println()
+
+	scanner := bufio.NewScanner(os.Stdin)
+	values := map[string]string{}
+
+	for i, placeholder := range placeholders {
+		fmt.Printf("  %s %s: ", green(fmt.Sprintf("[%d/%d]", i+1, len(placeholders))), cyan(placeholder))
+		if !scanner.Scan() {
+			// when the user hits Ctrl + C or Command + C (idk, i don't use mac, bro),
+			// i want it to show a cancelled message instead of just exiting stdin abruptly
+			fmt.Println()
+			fmt.Println(("Input cancelled."))
+			os.Exit(0)
+		}
+		values[placeholder] = scanner.Text()
+	}
+
+	fmt.Println()
+
+	// replace each {placeholder} with the value the user typed
+	resolved := re.ReplaceAllStringFunc(command, func(match string) string {
+		// strip the { } to get the key
+		key := strings.TrimSuffix(strings.TrimPrefix(match, "{"), "}")
+		return values[key]
+	})
+
+	return resolved, nil
 }
