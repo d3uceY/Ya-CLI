@@ -12,7 +12,7 @@ import (
 
 // i go need explain myself? 😭
 func GetAppVersion() string {
-	return "v0.3.2"
+	return "v0.3.3"
 }
 
 // i think you should know what this one does
