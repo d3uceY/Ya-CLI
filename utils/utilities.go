@@ -281,9 +281,10 @@ func ResolveTemplates(command string) (string, error) {
 	for i, placeholder := range placeholders {
 		fmt.Printf("  %s %s: ", green(fmt.Sprintf("[%d/%d]", i+1, len(placeholders))), cyan(placeholder))
 		if !scanner.Scan() {
-			// user hit Ctrl+C or closed stdin — exit cleanly
+			// when the user hits Ctrl + C or Command + C (idk, i don't use mac, bro),
+			// i want it to show a cancelled message instead of just exiting stdin abruptly
 			fmt.Println()
-			color.Yellow("Cancelled.")
+			fmt.Println(("Input cancelled."))
 			os.Exit(0)
 		}
 		values[placeholder] = scanner.Text()
