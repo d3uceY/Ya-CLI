@@ -221,3 +221,24 @@ func ImportShortcuts(path string) error {
 	// this permission param lowkey threw me off ngl
 	return os.WriteFile(shortCutpath, data, 0644)
 }
+
+// exports the shortcut and takes the concatenated file path as a param
+func ExportShortcuts(filepath string) error {
+	shortcuts, err := LoadShortcuts()
+
+	if err != nil {
+		return fmt.Errorf("Could not load Shortcuts for exports %v", err)
+	}
+
+	data, err := json.MarshalIndent(shortcuts, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	err = os.WriteFile(filepath, data, 0644)
+
+	if err != nil {
+		return err
+	}
+	return nil
+}
