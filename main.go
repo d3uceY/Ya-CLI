@@ -130,8 +130,11 @@ func main() {
 			fmt.Printf("%s %s\n", yellow("To list all shortcuts:"), green("ya list"))
 			fmt.Printf("%s %s\n", yellow("To show version:"), green("ya version"))
 			fmt.Printf("%s %s\n", yellow("To import shortcuts use:"), green("ya import <file-path>"))
+			fmt.Printf("%s %s\n", yellow("To export shortcuts use:"), green("ya export <dir> [--name <filename>]"))
 			fmt.Printf("%s %s\n", yellow("To search shortcuts use:"), green("ya search <shortcut>"))
-			fmt.Printf("%s %s\n", yellow("To show shortcuts use:"), green("ya show <shortcut>"))
+			fmt.Printf("%s %s\n", yellow("To show a shortcut use:"), green("ya show <shortcut>"))
+			fmt.Printf("%s %s\n", yellow("To run a shortcut use:"), green("ya <shortcut> [extra args...]"))
+			fmt.Printf("%s %s\n", yellow("To use template values in a command:"), green("ya add commit 'git commit -m {message}'"))
 
 			fmt.Println()
 		},
