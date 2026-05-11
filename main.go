@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"os"
 	"os/exec"
 	"runtime"
 
 	"github.com/d3uceY/Ya-CLI/utils"
+	"github.com/fatih/color"
+	"github.com/spf13/cobra"
 )
 
 func main() {
@@ -16,174 +17,225 @@ func main() {
 	green := color.New(color.FgGreen).SprintFunc()
 	yellow := color.New(color.FgYellow).SprintFunc()
 
-	shortcuts, err := utils.LoadShortcuts()
+	// root command — handles running shortcuts directly via `ya <shortcut> [args...]`
+	var rootCmd = &cobra.Command{
+		Use:   "ya",
+		Short: "Ya - a CLI shortcut runner",
+		// DisableFlagParsing allows extra args like -m to be passed through to the shortcut command
+		DisableFlagParsing: true,
+		Args:               cobra.MinimumNArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			shortcut := args[0]
 
-	if err != nil {
-		color.Red("Error loading shortcuts:", err)
-		os.Exit(1)
-	}
+			shortcuts, err := utils.LoadShortcuts()
+			if err != nil {
+				color.Red("Error loading shortcuts: %v", err)
+				os.Exit(1)
+			}
 
-	if len(os.Args) < 2 {
-		color.Red("Usage: ya <shortcut> \n for shortcuts use: ya help")
-		os.Exit(1)
-	}
+			command, exists := shortcuts[shortcut]
 
-	shortcut := os.Args[1]
+			if !exists {
+				fmt.Printf("Unknown shortcut: %s\n to add a new shortcut use: ya add <shortcut> '<command>'", yellow(shortcut))
+				os.Exit(1)
+			}
 
-	switch shortcut {
-	// Version command
-	case "version", "-v":
-		if len(os.Args) > 2 {
-			color.Red("usage: ya version")
-			os.Exit(1)
-		}
-		version := utils.GetAppVersion()
-		color.Green("Ya version: %s", version)
-		return
-
-	// list command
-	case "list", "-l", "--list":
-		if len(os.Args) > 2 {
-			color.Red("usage: ya list")
-			os.Exit(1)
-		}
-		color.Green("Available shortcuts:")
-		for key, cmd := range shortcuts {
-			fmt.Printf("- %s : %s\n", yellow(key), green(cmd))
-		}
-		return
-	// Help command
-	case "help", "--help", "-h":
-		if len(os.Args) > 2 {
-			color.Red("usage: ya help")
-			os.Exit(1)
-		}
-
-		fmt.Println("\n--- Ya Usage ---")
-
-		fmt.Printf("%s %s\n", yellow("To add a new shortcut use:"), green("ya add <shortcut> <command>"))
-		fmt.Printf("%s %s\n", yellow("To remove a shortcut use:"), green("ya remove <shortcut>"))
-		fmt.Printf("%s %s\n", yellow("To list all shortcuts:"), green("ya list"))
-		fmt.Printf("%s %s\n", yellow("To show version:"), green("ya version"))
-		fmt.Printf("%s %s\n", yellow("To import shortcuts use:"), green("ya import <file-path>"))
-		fmt.Printf("%s %s\n", yellow("To search shortcuts use:"), green("ya search <shortcut>"))
-		fmt.Printf("%s %s\n", yellow("To show shortcuts use:"), green("ya show <shortcut>"))
-
-		fmt.Println()
-		return
-
-	// Search command
-	case "search", "--search":
-		if len(os.Args) > 3 {
-			color.Red("usage: ya search <shortcut>")
-			os.Exit(1)
-		}
-		shortcuts, err := utils.SearchShortcut(os.Args[2])
-		if err != nil {
-			color.Red(err.Error())
-		}
-		if !(len(shortcuts) >= 1) {
-			color.Red("Shortcuts with `%s` not found", os.Args[2])
-		}
-		color.Green("Search results:")
-		for key, cmd := range shortcuts {
-			color.Yellow(" - %s :", key)
-			color.Green(" %s", cmd)
-		}
-		return
-
-	// Show command
-	case "show":
-		if len(os.Args) > 3 || len(os.Args) < 3 {
-			color.Red("usage: ya show <shortcut>")
-			os.Exit(1)
-		}
-		command, err := utils.GetShortcut(os.Args[2])
-		if err != nil {
-			color.Red(err.Error())
-			os.Exit(1)
-		}
-		fmt.Printf("Shortcut `%s` maps to command: %s\n", yellow(os.Args[2]), green(command))
-		return
-
-	// Add command
-	case "add":
-		if len(os.Args) < 4 {
-			color.Red("Usage: ya add <shortcut> '<command>'")
-			os.Exit(1)
-		}
-		shortcutName := os.Args[2]
-		command := os.Args[3]
-		if utils.IsInvalidString(shortcutName) || utils.IsInvalidString(command) {
-			color.Red("Usage: ya add <shortcut> '<command>'")
-			os.Exit(1)
-		}
-		utils.AddShortcut(shortcutName, command)
-		return
-
-		// import shortcuts
-	case "import":
-		if len(os.Args) < 3 {
-			color.Red("Usage: ya import '<file-path>'")
-			os.Exit(1)
-		}
-
-		err := utils.ImportShortcuts(os.Args[2])
-		if err != nil {
-			color.Red(err.Error())
-			os.Exit(1)
-		}
-		color.Green("Shortcut Imported `%s`", os.Args[2])
-		return
-	// Remove command
-	case "remove":
-		if len(os.Args) < 3 {
-			color.Red("Usage: ya remove <shortcut>")
-			os.Exit(1)
-		}
-		utils.RemoveShortcut(os.Args[2])
-		return
-	}
-
-	command, exists := shortcuts[shortcut]
-
-	// i added this because i was wondering how i would have been using this
-	// this allows arguments passing the shortcut commands to also pass messages like git commit -m 'message'
-	if len(os.Args) > 2 {
-		for index, value := range os.Args {
-			if !(index <= 1) {
-				if value != "-m" {
-					if os.Args[index-1] == "-m" {
-						command += " " + fmt.Sprintf("'%s'", value)
-					} else {
-						command += " " + value
+			// i added this because i was wondering how i would have been using this
+			// this allows arguments passing the shortcut commands to also pass messages like git commit -m 'message'
+			if len(args) > 1 {
+				for index, value := range args {
+					if index >= 1 {
+						if value != "-m" {
+							if args[index-1] == "-m" {
+								command += " " + fmt.Sprintf("'%s'", value)
+							} else {
+								command += " " + value
+							}
+						}
 					}
 				}
 			}
-		}
+
+			// if we are here, detect if it is windows, you get?
+			var execCmd *exec.Cmd
+			if runtime.GOOS == "windows" {
+				execCmd = exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", command)
+			} else {
+				// for linux and macOS typeshit
+				execCmd = exec.Command("bash", "-c", command)
+			}
+
+			execCmd.Stdout = os.Stdout
+			execCmd.Stderr = os.Stderr
+			execCmd.Stdin = os.Stdin
+
+			cmdError := execCmd.Run()
+			if cmdError != nil {
+				color.Red("Command failed: %v", cmdError)
+				os.Exit(1)
+			}
+		},
 	}
 
-	if !exists {
-		fmt.Printf("Unknown shortcut: %s\n to add a new shortcut use: ya add <shortcut> '<command>'", yellow(shortcut))
-		os.Exit(1)
+	// Version command
+	var versionCmd = &cobra.Command{
+		Use:     "version",
+		Short:   "Show the current Ya version",
+		Aliases: []string{"-v", "--version"},
+		Args:    cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			version := utils.GetAppVersion()
+			color.Green("Ya version: %s", version)
+		},
 	}
 
-	// if we are here, detect if it is windows, you get?
-	var cmd *exec.Cmd
-	if runtime.GOOS == "windows" {
-		cmd = exec.Command("powershell", "-NoProfile", "-NonInteractive", "-Command", command)
-	} else {
-		// for linux and macOS typeshit
-		cmd = exec.Command("bash", "-c", command)
+	// list command
+	var listCmd = &cobra.Command{
+		Use:     "list",
+		Short:   "List all available shortcuts",
+		Aliases: []string{"-l", "--list"},
+		Args:    cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			shortcuts, err := utils.LoadShortcuts()
+			if err != nil {
+				color.Red("Error loading shortcuts: %v", err)
+				os.Exit(1)
+			}
+			color.Green("Available shortcuts:")
+			for key, command := range shortcuts {
+				fmt.Printf("- %s : %s\n", yellow(key), green(command))
+			}
+		},
 	}
 
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
+	// Help command
+	var helpCmd = &cobra.Command{
+		Use:     "help",
+		Short:   "Show usage information",
+		Aliases: []string{"--help", "-h"},
+		Args:    cobra.NoArgs,
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("\n--- Ya Usage ---")
 
-	cmdError := cmd.Run()
-	if cmdError != nil {
-		color.Red("Command failed: %v", cmdError)
+			fmt.Printf("%s %s\n", yellow("To add a new shortcut use:"), green("ya add <shortcut> <command>"))
+			fmt.Printf("%s %s\n", yellow("To remove a shortcut use:"), green("ya remove <shortcut>"))
+			fmt.Printf("%s %s\n", yellow("To list all shortcuts:"), green("ya list"))
+			fmt.Printf("%s %s\n", yellow("To show version:"), green("ya version"))
+			fmt.Printf("%s %s\n", yellow("To import shortcuts use:"), green("ya import <file-path>"))
+			fmt.Printf("%s %s\n", yellow("To search shortcuts use:"), green("ya search <shortcut>"))
+			fmt.Printf("%s %s\n", yellow("To show shortcuts use:"), green("ya show <shortcut>"))
+
+			fmt.Println()
+		},
+	}
+
+	// Search command
+	var searchCmd = &cobra.Command{
+		Use:     "search <shortcut>",
+		Short:   "Search for shortcuts by name or command",
+		Aliases: []string{"--search"},
+		Args:    cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			shortcuts, err := utils.SearchShortcut(args[0])
+			if err != nil {
+				color.Red(err.Error())
+			}
+			if !(len(shortcuts) >= 1) {
+				color.Red("Shortcuts with `%s` not found", args[0])
+			}
+			color.Green("Search results:")
+			for key, command := range shortcuts {
+				color.Yellow(" - %s :", key)
+				color.Green(" %s", command)
+			}
+		},
+	}
+
+	// Show command
+	var showCmd = &cobra.Command{
+		Use:   "show <shortcut>",
+		Short: "Show the command mapped to a shortcut",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			command, err := utils.GetShortcut(args[0])
+			if err != nil {
+				color.Red(err.Error())
+				os.Exit(1)
+			}
+			fmt.Printf("Shortcut `%s` maps to command: %s\n", yellow(args[0]), green(command))
+		},
+	}
+
+	// Add command
+	var addCmd = &cobra.Command{
+		Use:   "add <shortcut> <command>",
+		Short: "Add a new shortcut",
+		Args:  cobra.ExactArgs(2),
+		Run: func(cmd *cobra.Command, args []string) {
+			shortcutName := args[0]
+			command := args[1]
+			if utils.IsInvalidString(shortcutName) || utils.IsInvalidString(command) {
+				color.Red("Usage: ya add <shortcut> '<command>'")
+				os.Exit(1)
+			}
+			utils.AddShortcut(shortcutName, command)
+		},
+	}
+
+	// import shortcuts
+	var importCmd = &cobra.Command{
+		Use:   "import <file-path>",
+		Short: "Import shortcuts from a JSON file",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			err := utils.ImportShortcuts(args[0])
+			if err != nil {
+				color.Red(err.Error())
+				os.Exit(1)
+			}
+			color.Green("Shortcut Imported `%s`", args[0])
+		},
+	}
+
+	// export shortcuts
+	// usage: ya export <dir> [--name <filename>]
+	// if --name is not provided, defaults to shortcuts.json
+	var exportName string
+	var exportCmd = &cobra.Command{
+		Use:   "export <dir>",
+		Short: "Export shortcuts to a JSON file in the given directory",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			filePath := args[0] + "/" + exportName
+			err := utils.ExportShortcuts(filePath)
+			if err != nil {
+				color.Red(err.Error())
+				os.Exit(1)
+			}
+			color.Green("Shortcuts exported to `%s`", filePath)
+		},
+	}
+	// --name flag to set the output filename, defaults to shortcuts.json
+	exportCmd.Flags().StringVarP(&exportName, "name", "n", "shortcuts.json", "Name of the exported file")
+
+	// Remove command
+	var removeCmd = &cobra.Command{
+		Use:   "remove <shortcut>",
+		Short: "Remove an existing shortcut",
+		Args:  cobra.ExactArgs(1),
+		Run: func(cmd *cobra.Command, args []string) {
+			utils.RemoveShortcut(args[0])
+		},
+	}
+
+	// register all subcommands onto the root
+	rootCmd.AddCommand(versionCmd, listCmd, helpCmd, searchCmd, showCmd, addCmd, importCmd, exportCmd, removeCmd)
+
+	// disable cobra's default help/completion so our custom help command takes over cleanly
+	rootCmd.SetHelpCommand(helpCmd)
+	rootCmd.CompletionOptions.DisableDefaultCmd = true
+
+	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
 }
