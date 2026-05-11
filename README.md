@@ -40,8 +40,13 @@ A lightweight command-line shortcut manager. Execute your frequently used PowerS
 
 - Create custom shortcuts for long or complex commands
 - Persistent storage of shortcuts in your user config directory
-- Fast command execution via PowerShell
-- Easy-to-use CLI interface
+- Fast command execution via PowerShell (Windows) or Bash (Linux/macOS)
+- Easy-to-use CLI interface built with Cobra
+- **Template values** — add `{placeholders}` to a command and Ya will prompt you to fill them in at runtime
+- Export your shortcuts to a JSON file for backup or sharing
+- Import shortcuts from a JSON file — merges with existing shortcuts
+- Search shortcuts by name or command
+- Pass extra arguments to shortcuts at runtime (e.g. `-m "message"`)
 - **GUI Available:** Prefer a graphical interface? Check out [Ya-GUI](https://github.com/d3uceY/Ya-GUI) - a modern desktop application for managing your shortcuts visually
 <img  alt="image" src="https://github.com/user-attachments/assets/258c0012-6944-43e7-95ee-a5f147ceca2b" width="100%"/>
 
@@ -149,9 +154,11 @@ Move-Item .\ya.exe "C:\Program Files\Ya\ya.exe"
 
 - **Search Shortcuts:** Quickly find shortcuts by name or command.
 - **Show Shortcut:** Display the command mapped to a specific shortcut.
-- **Import Shortcuts:** Import a set of shortcuts from a JSON file.
+- **Import Shortcuts:** Import a set of shortcuts from a JSON file — merges with existing ones.
+- **Export Shortcuts:** Export your shortcuts to a JSON file for backup or sharing.
 - **Remove Shortcut:** Delete a shortcut by name.
 - **Pass Extra Arguments:** You can now pass additional arguments to your shortcuts at runtime.
+- **Template Values:** Use `{placeholder}` syntax in commands — Ya will prompt you to fill each one in before running.
 <img width="550" height="198" alt="image" src="https://github.com/user-attachments/assets/666e368d-b43c-4723-9027-8a26ff9b371e" />
 
 See below for usage examples!
@@ -254,7 +261,52 @@ Finds shortcuts whose name or command contains the search term.
 ya import <file-path>
 ```
 
-Imports shortcuts from a JSON file (should be a map of shortcut names to commands).
+Imports shortcuts from a JSON file (should be a map of shortcut names to commands). Merges with your existing shortcuts — duplicate keys are overwritten.
+
+### Export Shortcuts to a File
+
+```powershell
+ya export <dir>
+ya export <dir> --name <filename>
+ya export <dir> -n <filename>
+```
+
+Exports all your shortcuts to a JSON file in the given directory. If `--name` is not provided, the file will be named `shortcuts.json`.
+
+**Examples:**
+
+```powershell
+ya export ./                        # exports to ./shortcuts.json
+ya export ./backups --name jan.json # exports to ./backups/jan.json
+```
+
+### Template Values in Commands
+
+You can add `{placeholder}` tokens anywhere in a command. When you run the shortcut, Ya will prompt you to fill in each value before executing.
+
+**Add a templated shortcut:**
+
+```powershell
+ya add commit 'git commit -m {message}'
+ya add deploy 'kubectl set image deployment/{app} {app}={image}:{tag}'
+```
+
+**Run it:**
+
+```powershell
+ya commit
+```
+
+```
+→ This command has template values. Fill them in below:
+
+  [1/1] message: fix login bug
+```
+
+Then runs `git commit -m fix login bug`.
+
+- The same `{placeholder}` used multiple times in one command is only prompted once
+- Commands without any `{}` tokens run immediately as normal
 
 ## How It Works
 
