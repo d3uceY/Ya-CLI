@@ -47,6 +47,10 @@ A lightweight command-line shortcut manager. Execute your frequently used PowerS
 - Import shortcuts from a JSON file — merges with existing shortcuts
 - Search shortcuts by name or command
 - Pass extra arguments to shortcuts at runtime (e.g. `-m "message"`)
+- **Rename shortcuts** — rename a shortcut key without changing its command
+- **Overwrite protection** — warns and asks for confirmation before overwriting an existing shortcut
+- **Safe delete** — confirmation prompt before removing a shortcut
+- **Shell tab-completion** — tab-complete shortcut names in Bash, Zsh, Fish, and PowerShell
 - **GUI Available:** Prefer a graphical interface? Check out [Ya-GUI](https://github.com/d3uceY/Ya-GUI) - a modern desktop application for managing your shortcuts visually
 <img  alt="image" src="https://github.com/user-attachments/assets/258c0012-6944-43e7-95ee-a5f147ceca2b" width="100%"/>
 
@@ -156,9 +160,12 @@ Move-Item .\ya.exe "C:\Program Files\Ya\ya.exe"
 - **Show Shortcut:** Display the command mapped to a specific shortcut.
 - **Import Shortcuts:** Import a set of shortcuts from a JSON file — merges with existing ones.
 - **Export Shortcuts:** Export your shortcuts to a JSON file for backup or sharing.
-- **Remove Shortcut:** Delete a shortcut by name.
+- **Remove Shortcut:** Delete a shortcut by name (prompts for confirmation).
+- **Rename Shortcut:** Rename a shortcut key without changing its command.
 - **Pass Extra Arguments:** You can now pass additional arguments to your shortcuts at runtime.
 - **Template Values:** Use `{placeholder}` syntax in commands — Ya will prompt you to fill each one in before running.
+- **Shell Tab-Completion:** Tab-complete shortcut names in your shell.
+- **Overwrite Protection:** Ya warns you before overwriting an existing shortcut.
 <img width="550" height="198" alt="image" src="https://github.com/user-attachments/assets/666e368d-b43c-4723-9027-8a26ff9b371e" />
 
 See below for usage examples!
@@ -188,7 +195,7 @@ ya help
 ya list
 ```
 
-Shows all shortcuts and their mapped commands.
+Shows all shortcuts, their mapped commands, and a total count at the bottom.
 
 ### Add a New Shortcut
 
@@ -206,13 +213,46 @@ ya add dev 'cd C:\Projects\MyApp; npm run dev'
 ya add ports 'netstat -ano | findstr LISTENING'
 ```
 
+If a shortcut with that name already exists, Ya will warn you and ask before overwriting:
+
+```
+Shortcut gs already exists: git status
+Overwrite? [y/N]:
+```
+
 ### Remove a Shortcut
 
 ```powershell
 ya remove <shortcut-name>
 ```
 
-Deletes the specified shortcut.
+Deletes the specified shortcut. Ya will show the shortcut's current command and ask for confirmation before deleting.
+
+```
+This will remove the shortcut gs: git status
+Are you sure? [y/N]:
+```
+
+### Rename a Shortcut
+
+```powershell
+ya rename <shortcut-name> <new-name>
+```
+
+Renames a shortcut key without changing the command it maps to.
+
+**Example:**
+
+```powershell
+ya rename gs gitstatus   # renames the key, keeps the same command
+```
+
+Ya will show a confirmation before renaming:
+
+```
+This will rename the shortcut gs: git status to gitstatus
+Are you sure? [y/N]:
+```
 
 ### Execute a Shortcut
 
@@ -307,6 +347,32 @@ Then runs `git commit -m fix login bug`.
 
 - The same `{placeholder}` used multiple times in one command is only prompted once
 - Commands without any `{}` tokens run immediately as normal
+
+### Shell Tab-Completion
+
+Ya supports tab-completion of shortcut names in your shell. Run the setup command once for your shell:
+
+**PowerShell:**
+```powershell
+ya completion powershell >> $PROFILE
+```
+
+**Bash:**
+```bash
+echo 'source <(ya completion bash)' >> ~/.bashrc
+```
+
+**Zsh:**
+```zsh
+echo 'source <(ya completion zsh)' >> ~/.zshrc
+```
+
+**Fish:**
+```fish
+ya completion fish | source
+```
+
+After restarting your terminal (or reloading your profile), `ya <TAB>` will show your saved shortcut names as suggestions. This works for `ya show`, `ya remove`, `ya rename`, and `ya search` as well.
 
 ## How It Works
 
