@@ -189,6 +189,19 @@ func main() {
 				color.Red("Usage: ya add <shortcut> '<command>'")
 				os.Exit(1)
 			}
+
+			existing, err := utils.GetShortcut(shortcutName)
+			if err == nil {
+				fmt.Printf("Shortcut %s already exists: %s\n", yellow(shortcutName), green(existing))
+				fmt.Printf("Overwrite? [y/N]: ")
+				var input string
+				fmt.Scanln(&input)
+				if input != "y" && input != "Y" {
+					color.Yellow("Aborted.")
+					return
+				}
+			}
+
 			utils.AddShortcut(shortcutName, command)
 		},
 	}
