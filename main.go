@@ -160,6 +160,7 @@ func main() {
 				color.Yellow(" - %s :", key)
 				color.Green(" %s", command)
 			}
+			fmt.Printf("\n%s\n", yellow(fmt.Sprintf("%d shortcut(s)", len(shortcuts))))
 		},
 	}
 
