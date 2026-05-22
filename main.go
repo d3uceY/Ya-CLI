@@ -17,6 +17,22 @@ func main() {
 	green := color.New(color.FgGreen).SprintFunc()
 	yellow := color.New(color.FgYellow).SprintFunc()
 
+	// completion function — reads shortcut names from storage and returns them for shell tab-completion
+	shortcutCompletions := func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
+		if len(args) > 0 {
+			return nil, cobra.ShellCompDirectiveNoFileComp
+		}
+		shortcuts, err := utils.LoadShortcuts()
+		if err != nil {
+			return nil, cobra.ShellCompDirectiveError
+		}
+		names := make([]string, 0, len(shortcuts))
+		for name := range shortcuts {
+			names = append(names, name)
+		}
+		return names, cobra.ShellCompDirectiveNoFileComp
+	}
+
 	// root command — handles running shortcuts directly via `ya <shortcut> [args...]`
 	var rootCmd = &cobra.Command{
 		Use:   "ya",
@@ -83,6 +99,7 @@ func main() {
 				os.Exit(1)
 			}
 		},
+		ValidArgsFunction: shortcutCompletions,
 	}
 
 	// Version command
@@ -143,10 +160,11 @@ func main() {
 
 	// Search command
 	var searchCmd = &cobra.Command{
-		Use:     "search <shortcut>",
-		Short:   "Search for shortcuts by name or command",
-		Aliases: []string{"--search"},
-		Args:    cobra.ExactArgs(1),
+		Use:               "search <shortcut>",
+		Short:             "Search for shortcuts by name or command",
+		Aliases:           []string{"--search"},
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: shortcutCompletions,
 		Run: func(cmd *cobra.Command, args []string) {
 			shortcuts, err := utils.SearchShortcut(args[0])
 			if err != nil {
@@ -166,9 +184,10 @@ func main() {
 
 	// Show command
 	var showCmd = &cobra.Command{
-		Use:   "show <shortcut>",
-		Short: "Show the command mapped to a shortcut",
-		Args:  cobra.ExactArgs(1),
+		Use:               "show <shortcut>",
+		Short:             "Show the command mapped to a shortcut",
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: shortcutCompletions,
 		Run: func(cmd *cobra.Command, args []string) {
 			command, err := utils.GetShortcut(args[0])
 			if err != nil {
@@ -246,9 +265,10 @@ func main() {
 
 	// Remove command
 	var removeCmd = &cobra.Command{
-		Use:   "remove <shortcut>",
-		Short: "Remove an existing shortcut",
-		Args:  cobra.ExactArgs(1),
+		Use:               "remove <shortcut>",
+		Short:             "Remove an existing shortcut",
+		Args:              cobra.ExactArgs(1),
+		ValidArgsFunction: shortcutCompletions,
 		Run: func(cmd *cobra.Command, args []string) {
 			shortcutName := args[0]
 			existing, err := utils.GetShortcut(shortcutName)
@@ -270,9 +290,10 @@ func main() {
 	}
 
 	var renameCmd = &cobra.Command{
-		Use:   "rename <shortcut> <new-name>",
-		Short: "Rename an existing shortcut",
-		Args:  cobra.ExactArgs(2),
+		Use:               "rename <shortcut> <new-name>",
+		Short:             "Rename an existing shortcut",
+		Args:              cobra.ExactArgs(2),
+		ValidArgsFunction: shortcutCompletions,
 		Run: func(cmd *cobra.Command, args []string) {
 			shortcutName := args[0]
 			newName := args[1]
@@ -303,9 +324,8 @@ func main() {
 	// register all subcommands onto the root
 	rootCmd.AddCommand(versionCmd, listCmd, helpCmd, searchCmd, showCmd, addCmd, importCmd, exportCmd, removeCmd, renameCmd)
 
-	// disable cobra's default help/completion so our custom help command takes over cleanly
+	// disable cobra's default help so our custom help command takes over cleanly
 	rootCmd.SetHelpCommand(helpCmd)
-	rootCmd.CompletionOptions.DisableDefaultCmd = true
 
 	if err := rootCmd.Execute(); err != nil {
 		os.Exit(1)
