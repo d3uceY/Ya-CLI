@@ -113,6 +113,7 @@ func main() {
 			for key, command := range shortcuts {
 				fmt.Printf("- %s : %s\n", yellow(key), green(command))
 			}
+			fmt.Printf("\n%s\n", yellow(fmt.Sprintf("%d shortcut(s)", len(shortcuts))))
 		},
 	}
 
