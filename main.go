@@ -248,6 +248,21 @@ func main() {
 		Short: "Remove an existing shortcut",
 		Args:  cobra.ExactArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
+			shortcutName := args[0]
+			existing, err := utils.GetShortcut(shortcutName)
+			if err != nil {
+				color.Red(err.Error())
+				os.Exit(1)
+			}
+			
+			fmt.Printf("This will remove the shortcut %s: %s\n", yellow(shortcutName), green(existing))
+			fmt.Printf("Are you sure? [y/N]: ")
+			var input string
+			fmt.Scanln(&input)
+			if input != "y" && input != "Y" {
+				color.Yellow("Aborted.")
+				return
+			}
 			utils.RemoveShortcut(args[0])
 		},
 	}

@@ -14,7 +14,7 @@ import (
 
 // i go need explain myself? 😭
 func GetAppVersion() string {
-	return "v0.4.0"
+	return "v0.4.1"
 }
 
 // i think you should know what this one does
