@@ -156,6 +156,34 @@ func RemoveShortcut(name string) error {
 	return nil
 }
 
+func RenameShortcut(oldName, newName string) error {
+    shortcuts, err := LoadShortcuts()
+    if err != nil {
+        return err
+    }
+
+    command, exists := shortcuts[oldName]
+    if !exists {
+        return fmt.Errorf("shortcut `%s` not found", oldName)
+    }
+
+    shortcuts[newName] = command
+    delete(shortcuts, oldName)
+
+    data, err := json.MarshalIndent(shortcuts, "", "  ")
+    if err != nil {
+        return err
+    }
+
+    appDir, err := getAppDataDir()
+    if err != nil {
+        return err
+    }
+
+    shortCutpath := filepath.Join(appDir, "shortcuts.json")
+    return os.WriteFile(shortCutpath, data, 0644)
+}
+
 func IsInvalidString(s string) bool {
 	if len(s) == 0 {
 		return true

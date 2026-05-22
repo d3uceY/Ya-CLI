@@ -254,7 +254,7 @@ func main() {
 				color.Red(err.Error())
 				os.Exit(1)
 			}
-			
+
 			fmt.Printf("This will remove the shortcut %s: %s\n", yellow(shortcutName), green(existing))
 			fmt.Printf("Are you sure? [y/N]: ")
 			var input string
@@ -267,8 +267,39 @@ func main() {
 		},
 	}
 
+	var renameCmd = &cobra.Command{
+		Use:   "rename <shortcut> <new-name>",
+		Short: "Rename an existing shortcut",
+		Args:  cobra.ExactArgs(2),
+		Run: func(cmd *cobra.Command, args []string) {
+			shortcutName := args[0]
+			newName := args[1]
+			existing, err := utils.GetShortcut(shortcutName)
+			if err != nil {
+				color.Red(err.Error())
+				os.Exit(1)
+			}
+
+			fmt.Printf("This will rename the shortcut %s: %s to %s\n", yellow(shortcutName), green(existing), yellow(newName))
+			fmt.Printf("Are you sure? [y/N]: ")
+			var input string
+			fmt.Scanln(&input)
+			if input != "y" && input != "Y" {
+				color.Yellow("Aborted.")
+				return
+			}
+
+			err = utils.RenameShortcut(shortcutName, newName)
+			if err != nil {
+				color.Red(err.Error())
+				os.Exit(1)
+			}
+			color.Green("Renamed `%s` to `%s`", shortcutName, newName)
+		},
+	}
+
 	// register all subcommands onto the root
-	rootCmd.AddCommand(versionCmd, listCmd, helpCmd, searchCmd, showCmd, addCmd, importCmd, exportCmd, removeCmd)
+	rootCmd.AddCommand(versionCmd, listCmd, helpCmd, searchCmd, showCmd, addCmd, importCmd, exportCmd, removeCmd, renameCmd)
 
 	// disable cobra's default help/completion so our custom help command takes over cleanly
 	rootCmd.SetHelpCommand(helpCmd)
