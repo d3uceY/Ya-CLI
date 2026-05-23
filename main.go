@@ -154,16 +154,7 @@ func main() {
 			fmt.Printf("%s %s\n", yellow("To run a shortcut use:"), green("ya <shortcut> [extra args...]"))
 			fmt.Printf("%s %s\n", yellow("To use template values in a command:"), green("ya add commit 'git commit -m {message}'"))
 
-			var autocompleteHint string
-			switch runtime.GOOS {
-			case "windows":
-				autocompleteHint = "ya completion powershell | Out-String | Invoke-Expression  (add to $PROFILE for persistence)"
-			case "darwin":
-				autocompleteHint = "ya completion zsh > \"${fpath[1]}/_ya\"  (restart shell after)"
-			default:
-				autocompleteHint = "ya completion bash > /etc/bash_completion.d/ya  (restart shell after)"
-			}
-			fmt.Printf("%s %s\n", yellow("To enable shell autocomplete:"), green(autocompleteHint))
+			fmt.Printf("%s %s\n", yellow("To enable shell autocomplete:"), green("ya completion <shell>   (see README for setup: https://github.com/d3uceY/Ya-CLI#shell-tab-completion)"))
 
 			fmt.Println()
 		},
