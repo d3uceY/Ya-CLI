@@ -350,29 +350,63 @@ Then runs `git commit -m fix login bug`.
 
 ### Shell Tab-Completion
 
-Ya supports tab-completion of shortcut names in your shell. Run the setup command once for your shell:
+Ya supports tab-completion of shortcut names — press `Tab` after `ya` and your shell will suggest your saved shortcuts.
 
-**PowerShell:**
+**Setup is a one-time step.** Follow the instructions for your shell below.
+
+---
+
+#### 🪟 PowerShell (Windows)
+
+> **First-time only:** If you have never set up a PowerShell profile before, the profile file and its folder may not exist yet. Run this command to create them:
+> ```powershell
+> New-Item -ItemType Directory -Force -Path (Split-Path $PROFILE)
+> ```
+
+Then append the completion script to your profile:
 ```powershell
 ya completion powershell >> $PROFILE
 ```
 
-**Bash:**
+Reload your profile to activate it immediately (or just restart your terminal):
+```powershell
+. $PROFILE
+```
+
+---
+
+#### 🐧 Bash (Linux)
+
 ```bash
 echo 'source <(ya completion bash)' >> ~/.bashrc
+source ~/.bashrc
 ```
 
-**Zsh:**
+---
+
+#### 🍎 Zsh (macOS / Linux)
+
 ```zsh
 echo 'source <(ya completion zsh)' >> ~/.zshrc
+source ~/.zshrc
 ```
 
-**Fish:**
+---
+
+#### 🐟 Fish
+
 ```fish
 ya completion fish | source
 ```
 
-After restarting your terminal (or reloading your profile), `ya <TAB>` will show your saved shortcut names as suggestions. This works for `ya show`, `ya remove`, `ya rename`, and `ya search` as well.
+To make it permanent:
+```fish
+ya completion fish > ~/.config/fish/completions/ya.fish
+```
+
+---
+
+After setup, `ya <TAB>` will suggest your saved shortcut names. This works for `ya show`, `ya remove`, `ya rename`, and `ya search` as well.
 
 ## How It Works
 
