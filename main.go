@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"runtime"
 
+	"github.com/d3uceY/Ya-CLI/tui"
 	"github.com/d3uceY/Ya-CLI/utils"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
@@ -34,13 +35,20 @@ func main() {
 	}
 
 	// root command — handles running shortcuts directly via `ya <shortcut> [args...]`
+	// or launches the TUI when called with no arguments.
 	var rootCmd = &cobra.Command{
 		Use:   "ya",
 		Short: "Ya - a CLI shortcut runner",
 		// DisableFlagParsing allows extra args like -m to be passed through to the shortcut command
 		DisableFlagParsing: true,
-		Args:               cobra.MinimumNArgs(1),
+		Args:               cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
+			// No arguments → launch the interactive TUI
+			if len(args) == 0 {
+				tui.Start()
+				return
+			}
+
 			shortcut := args[0]
 
 			shortcuts, err := utils.LoadShortcuts()
