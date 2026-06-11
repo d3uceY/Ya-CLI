@@ -137,7 +137,15 @@ func (m *Model) rebuildSorted() {
 	for k := range m.shortcuts {
 		m.sortedKeys = append(m.sortedKeys, k)
 	}
-	sort.Strings(m.sortedKeys)
+	// pinned items first, then alphabetical within each group
+	sort.Slice(m.sortedKeys, func(i, j int) bool {
+		pi := m.shortcuts[m.sortedKeys[i]].Pinned
+		pj := m.shortcuts[m.sortedKeys[j]].Pinned
+		if pi != pj {
+			return pi
+		}
+		return m.sortedKeys[i] < m.sortedKeys[j]
+	})
 	m.applyFilter()
 }
 

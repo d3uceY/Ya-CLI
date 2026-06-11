@@ -23,11 +23,14 @@ func (m Model) viewList() string {
 	visible := m.visibleRows()
 	nameWidth := m.calcNameColWidth()
 
-	// If the selected row has a description sub-line, reserve one extra line.
+	// The description block is 2 lines (border + text), reserve both.
 	selHasDesc := m.selectedKey() != "" && m.shortcuts[m.selectedKey()].Description != ""
 	effective := visible
 	if selHasDesc {
-		effective--
+		effective -= 2
+		if effective < 1 {
+			effective = 1
+		}
 	}
 
 	if len(m.filtered) == 0 {
@@ -61,7 +64,7 @@ func (m Model) viewList() string {
 		}
 		used := shown
 		if selHasDesc {
-			used++
+			used += 2
 		}
 		for i := used; i < visible; i++ {
 			b.WriteByte('\n')
@@ -145,17 +148,21 @@ func (m Model) renderRow(name string, selected bool, nameColWidth int) string {
 	return prefix + nameStr + "  " + cmdStr
 }
 
-// renderDescLine renders the description sub-line for the selected shortcut.
+// renderDescLine renders the 2-line description block (border + text) for the
+// selected shortcut, aligned to start under the command column.
 func (m Model) renderDescLine(nameColWidth int) string {
 	s := m.shortcuts[m.selectedKey()]
-	const prefixLen = 6
-	indent := strings.Repeat(" ", prefixLen+nameColWidth+2)
-	availW := m.width - prefixLen - nameColWidth - 2
-	if availW < 10 {
+	// visual prefix width = 2 spaces + ❯ (1 cell) + 2 spaces = 5
+	const visualPfx = 5
+	indent := strings.Repeat(" ", visualPfx+nameColWidth+2)
+	availW := m.width - visualPfx - nameColWidth - 2
+	if availW < 10 || s.Description == "" {
 		return ""
 	}
-	desc := truncateStr(s.Description, availW-2)
-	return indent + sDescLine.Width(availW).Render(" "+desc)
+	borderLine := indent + sDim.Render(strings.Repeat("─", availW))
+	desc := truncateStr(s.Description, availW-1)
+	contentLine := indent + sDescLine.Render(desc)
+	return borderLine + "\n" + contentLine
 }
 
 // blankRow is kept for interface compatibility.

@@ -71,12 +71,10 @@ var (
 	sDivider = lipgloss.NewStyle().Foreground(lipgloss.Color(colBorder))
 
 	// ── description sub-line (shown below selected row) ──────────────────
+	// #7A8FA6 — muted steel blue, distinct from colDim but still quiet
 	sDescLine = lipgloss.NewStyle().
-			Foreground(lipgloss.Color(colDim)).
-			Italic(true).
-			BorderStyle(lipgloss.NormalBorder()).
-			BorderTop(true).
-			BorderForeground(lipgloss.Color(colBorder))
+		Foreground(lipgloss.Color("#7A8FA6")).
+		Italic(true)
 
 	// ── count / info ─────────────────────────────────────────────────────
 	sCount = lipgloss.NewStyle().Foreground(lipgloss.Color(colDim))
