@@ -225,17 +225,19 @@ func (m Model) handleSearchKey(msg tea.KeyMsg) (tea.Model, tea.Cmd) {
 		m.searchInput.Blur()
 		return m, nil
 
-	case key.Matches(msg, keys.Up):
+	// Arrow-only navigation while typing — do NOT intercept j/k so they
+	// go into the search box as regular characters.
+	case msg.String() == "up":
 		m.cursor--
 		m.clampCursor()
 		return m, nil
 
-	case key.Matches(msg, keys.Down):
+	case msg.String() == "down":
 		m.cursor++
 		m.clampCursor()
 		return m, nil
 
-	case key.Matches(msg, keys.Quit):
+	case msg.String() == "ctrl+c":
 		return m, tea.Quit
 	}
 
@@ -624,4 +626,3 @@ func (m Model) updateInputs(msg tea.Msg) (tea.Model, tea.Cmd) {
 func ignoreKeyFor(d time.Duration) tea.Cmd {
 	return tea.Tick(d, func(time.Time) tea.Msg { return enableKeysMsg{} })
 }
-
