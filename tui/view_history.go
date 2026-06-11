@@ -129,7 +129,7 @@ func (m Model) viewConfirm() string {
 	b.WriteByte('\n')
 	b.WriteByte('\n')
 	b.WriteString(
-		"  " + sError.Render("[ y ]") + sDim.Render("  ya") +
+		"  " + sError.Render("[ y ]") + sDim.Render("  yes") +
 			"     " +
 			sDim.Render("[ n ]  cancel"),
 	)
