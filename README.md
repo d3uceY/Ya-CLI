@@ -3,28 +3,333 @@
     <h1>Ya - CLI</h1>
 </div>
 
-
-A lightweight command-line shortcut manager. Execute your frequently used PowerShell commands with simple, memorable shortcuts.
+A lightweight command-line shortcut manager. Save, run, and organize your frequently used commands with simple, memorable shortcuts — or explore them visually inside the built-in interactive TUI.
 
 <div align="center">
     <img src="https://github.com/user-attachments/assets/8ec0bed7-a6b0-48ec-a642-e9c0a76154f4" />
 </div>
 
-
-
-**Name Origin:** "Ya" comes from the Spanish word meaning "right now" - reflecting the instant execution of your commands.
+**Name Origin:** "Ya" comes from the Spanish word meaning "right now" — reflecting the instant execution of your commands.
 
 ## ⬇️ Download
+
 ![Ya CLI Banner](https://img.shields.io/badge/Made%20with-Go-00ADD8?style=for-the-badge&logo=go)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=for-the-badge)
 
-### Ya CLI — Multi-Platform Support
+| Platform | Link |
+|----------|------|
+| 🪟 Windows | [![Download](https://img.shields.io/badge/Download-Windows-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/d3uceY/Ya-CLI/releases/latest) |
+| 🍎 macOS | [![Download](https://img.shields.io/badge/Download-macOS-000000?style=for-the-badge&logo=apple&logoColor=white)](https://github.com/d3uceY/Ya-CLI/releases/latest) |
+| 🐧 Linux | [![Download](https://img.shields.io/badge/Download-Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)](https://github.com/d3uceY/Ya-CLI/releases/latest) |
 
-#### 🪟 Windows
+---
 
-[![Download for Windows](https://img.shields.io/badge/Download-Windows-0078D4?style=for-the-badge\&logo=windows\&logoColor=white)](https://github.com/d3uceY/Ya-CLI/releases/latest)
+## Features
 
-#### 🍎 macOS
+### CLI
+- Create, run, rename, and delete shortcuts
+- Template values — add `{placeholders}` and Ya prompts you to fill them in at runtime
+- Import / export shortcuts to JSON
+- Search shortcuts by name or command
+- Pass extra arguments to shortcuts at runtime
+- Overwrite protection and safe-delete confirmation prompts
+- Shell tab-completion (Bash, Zsh, Fish, PowerShell)
+
+### Interactive TUI (`ya` with no arguments)
+- Full-screen terminal UI — browse, run, and manage shortcuts without typing subcommands
+- **Pin shortcuts** to keep your most-used ones at the top of the list
+- **Descriptions** — add an optional description to any shortcut, shown inline when selected
+- **Run history** — every shortcut run is recorded; browse it from the TUI
+- **Saved directories** — save frequently-used paths and reference them easily
+- **Template fill-in page** — interactive form for `{placeholder}` values inside the TUI
+- **Search as you type** — filter the list instantly; arrow keys still navigate while typing
+- **Import / export** from inside the TUI
+- Runs commands natively (TUI exits cleanly before executing)
+- Shared data directory with [Ya-GUI](https://github.com/d3uceY/Ya-GUI) — changes in either app are immediately visible in the other
+
+---
+
+## Installation
+
+### 🍺 Homebrew (macOS & Linux)
+
+```bash
+brew tap d3uceY/homebrew-ya
+brew install ya
+```
+
+### Build from Source
+
+**Prerequisites:** Go 1.25.5+
+
+```bash
+git clone https://github.com/d3uceY/Ya-CLI
+cd Ya-CLI/ya-cli
+```
+
+**Windows:**
+```powershell
+go build -o ya.exe .
+```
+
+**Linux / macOS:**
+```bash
+go build -o ya .
+chmod +x ya
+```
+
+### Adding to PATH
+
+#### Windows (PowerShell, as Administrator)
+```powershell
+New-Item -Path "C:\Program Files\Ya" -ItemType Directory -Force
+Move-Item .\ya.exe "C:\Program Files\Ya\ya.exe"
+[Environment]::SetEnvironmentVariable("Path", $env:Path + ";C:\Program Files\Ya", "User")
+```
+
+#### Linux / macOS
+```bash
+sudo mv ya /usr/local/bin/
+```
+
+---
+
+## CLI Usage
+
+### Run a shortcut
+```bash
+ya <shortcut>
+```
+
+### Add a shortcut
+```bash
+ya add <name> '<command>'
+```
+
+If a shortcut with that name already exists, Ya warns you before overwriting.
+
+### Remove a shortcut
+```bash
+ya remove <name>
+```
+Prompts for confirmation before deleting.
+
+### Rename a shortcut
+```bash
+ya rename <old-name> <new-name>
+```
+
+### List all shortcuts
+```bash
+ya list
+```
+
+### Show a shortcut's command
+```bash
+ya show <name>
+```
+
+### Search shortcuts
+```bash
+ya search <term>
+```
+Matches against both the shortcut name and its command.
+
+### Import from a JSON file
+```bash
+ya import <file-path>
+```
+Merges with existing shortcuts — duplicate keys are overwritten.
+
+### Export to a JSON file
+```bash
+ya export <directory>
+ya export <directory> --name <filename>   # default: shortcuts.json
+```
+
+### Template values
+Add `{placeholder}` tokens to a command. Ya prompts you to fill them in at runtime:
+
+```bash
+ya add commit 'git commit -m {message}'
+ya add deploy 'kubectl set image deployment/{app} {app}={image}:{tag}'
+```
+
+Running `ya commit`:
+```
+→ This command has template values. Fill them in below:
+
+  [1/1] message: fix login bug
+```
+
+The same `{placeholder}` used multiple times is only prompted once.
+
+### Pass extra arguments
+Extra arguments are appended to the shortcut command at runtime:
+
+```bash
+ya gcm -m "Initial commit"
+# runs: git commit -m "Initial commit"
+```
+
+---
+
+## TUI — Interactive Mode
+
+Launch the TUI by running `ya` with no arguments:
+
+```bash
+ya
+```
+
+### Navigation
+
+| Key | Action |
+|-----|--------|
+| `↑` / `k` | Move up |
+| `↓` / `j` | Move down |
+| `Enter` | Run selected shortcut |
+| `q` / `Ctrl+C` | Quit |
+| `?` | Toggle help page |
+| `f` | Toggle fullscreen |
+| `Esc` | Go back / cancel |
+
+### Search
+
+| Key | Action |
+|-----|--------|
+| `/` | Open search |
+| Type anything | Filter list in real time |
+| `↑` / `↓` | Navigate results while typing |
+| `Enter` / `Esc` | Close search |
+
+> Letter keys like `j` and `k` type normally into the search box and do **not** trigger navigation.
+
+### Shortcut Management
+
+| Key | Action |
+|-----|--------|
+| `a` | Add a new shortcut (name, command, optional description) |
+| `e` | Edit selected shortcut (command + description) |
+| `r` | Rename selected shortcut |
+| `d` / `x` | Delete selected shortcut (with confirmation) |
+| `p` | Pin / unpin selected shortcut |
+| `i` | Import shortcuts from a JSON file |
+| `o` | Export shortcuts to a JSON file |
+
+### Pinned shortcuts
+
+Press `p` on any shortcut to pin it. Pinned shortcuts float to the top of the list and are marked with a `◆` indicator. Press `p` again to unpin.
+
+### Descriptions
+
+When adding (`a`) or editing (`e`) a shortcut, fill in an optional description. When a shortcut with a description is selected, it appears as a sub-line beneath the row:
+
+```
+  ❯  gt    git tag -d v{tag}; git tag -a v{tag} -m "{metadata}"
+             ──────────────────────────────────────────────────
+             template for pushing git tags
+```
+
+### Run History
+
+| Key | Action |
+|-----|--------|
+| `h` | Open history page |
+| `c` | Clear all history (with confirmation) |
+
+The history page shows every shortcut you've run, with the shortcut name, command, and timestamp.
+
+### Saved Directories
+
+| Key | Action |
+|-----|--------|
+| `D` | Open saved directories page |
+| `a` (on dirs page) | Add a new saved directory |
+| `d` (on dirs page) | Remove a saved directory |
+
+### Template prompts in the TUI
+
+If a shortcut contains `{placeholder}` tokens, the TUI opens a fill-in form before running. After submitting, the TUI exits and the resolved command runs natively in your terminal.
+
+---
+
+## Data Storage
+
+All data is stored in your user config directory and **shared between Ya CLI and Ya GUI**:
+
+| File | Contents |
+|------|----------|
+| `shortcuts.json` | Shortcut name → command map (CLI-compatible) |
+| `shortcuts-meta.json` | Descriptions, pin status, run counts, last-run timestamps |
+| `history.json` | Run history (up to 500 entries) |
+| `config.json` | App config — saved directories |
+
+**Default paths:**
+- Windows: `%APPDATA%\ya\data\`
+- macOS: `~/Library/Application Support/ya/data/`
+- Linux: `~/.config/ya/data/`
+
+---
+
+## Shell Tab-Completion
+
+Tab-complete shortcut names after `ya`. Works for `show`, `remove`, `rename`, and `search` too.
+
+#### 🪟 PowerShell
+```powershell
+# Create profile directory if needed
+New-Item -ItemType Directory -Force -Path (Split-Path $PROFILE)
+
+ya completion powershell >> $PROFILE
+. $PROFILE
+```
+
+#### 🐧 Bash
+```bash
+echo 'source <(ya completion bash)' >> ~/.bashrc
+source ~/.bashrc
+```
+
+#### 🍎 Zsh
+```zsh
+echo 'source <(ya completion zsh)' >> ~/.zshrc
+source ~/.zshrc
+```
+
+#### 🐟 Fish
+```fish
+ya completion fish > ~/.config/fish/completions/ya.fish
+```
+
+---
+
+## GUI Companion
+
+Prefer a graphical interface? [Ya-GUI](https://github.com/d3uceY/Ya-GUI) is a desktop app that reads and writes the same data files. Anything created in the CLI or TUI is instantly available in the GUI, and vice versa.
+
+<img alt="Ya GUI" src="https://github.com/user-attachments/assets/258c0012-6944-43e7-95ee-a5f147ceca2b" width="100%"/>
+
+---
+
+## Troubleshooting
+
+**"Unknown shortcut"** — the shortcut doesn't exist. Use `ya list` to see what's saved, or `ya add` to create one.
+
+**Commands not working** — test the raw command in your terminal first before adding it as a shortcut.
+
+**TUI looks garbled** — ensure your terminal supports UTF-8 and 256-colour output (Windows Terminal, iTerm2, and most modern terminals do).
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE) for details.
+
+## Contributing
+
+Contributions are welcome! Feel free to open an issue or pull request.
+
 
 [![Download for macOS](https://img.shields.io/badge/Download-macOS-000000?style=for-the-badge\&logo=apple\&logoColor=white)](https://github.com/d3uceY/Ya-CLI/releases/latest)
 
