@@ -42,7 +42,7 @@ func main() {
 		DisableFlagParsing: true,
 		Args:               cobra.ArbitraryArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			// No arguments → launch the interactive TUI
+			// No arguments, launch the interactive TUI
 			if len(args) == 0 {
 				tui.Start()
 				return
@@ -59,7 +59,7 @@ func main() {
 			command, exists := shortcuts[shortcut]
 
 			if !exists {
-				fmt.Printf("Unknown shortcut: %s\n to add a new shortcut use: ya add <shortcut> '<command>'", accent(shortcut))
+				fmt.Printf("Unknown shortcut: %s\n to add a new shortcut use: ya add <shortcut> '<command>'\n", accent(shortcut))
 				os.Exit(1)
 			}
 

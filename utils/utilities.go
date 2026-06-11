@@ -10,7 +10,7 @@ import (
 )
 
 func GetAppVersion() string {
-	return "v0.4.2"
+	return "v0.5.0"
 }
 
 func getAppDataDir() (string, error) {
