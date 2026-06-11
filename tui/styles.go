@@ -33,7 +33,7 @@ var (
 	sTemplate = lipgloss.NewStyle().Foreground(lipgloss.Color(colTemplate))
 
 	// keep sMuted as an alias for backward compat with other files
-	sMuted  = sDim
+	sMuted   = sDim
 	sPrimary = sAccent
 
 	// ── header ────────────────────────────────────────────────────────────
@@ -70,6 +70,14 @@ var (
 	// ── divider ──────────────────────────────────────────────────────────
 	sDivider = lipgloss.NewStyle().Foreground(lipgloss.Color(colBorder))
 
+	// ── description sub-line (shown below selected row) ──────────────────
+	sDescLine = lipgloss.NewStyle().
+			Foreground(lipgloss.Color(colDim)).
+			Italic(true).
+			BorderStyle(lipgloss.NormalBorder()).
+			BorderTop(true).
+			BorderForeground(lipgloss.Color(colBorder))
+
 	// ── count / info ─────────────────────────────────────────────────────
 	sCount = lipgloss.NewStyle().Foreground(lipgloss.Color(colDim))
 
@@ -78,38 +86,38 @@ var (
 
 	// ── form ─────────────────────────────────────────────────────────────
 	sFormTitle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(colText)).
-		Bold(true).
-		Padding(0, 2)
+			Foreground(lipgloss.Color(colText)).
+			Bold(true).
+			Padding(0, 2)
 
 	sFormLabel = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(colAccent)).
-		Padding(0, 2)
+			Foreground(lipgloss.Color(colAccent)).
+			Padding(0, 2)
 
 	sFormHint = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(colDim)).
-		Italic(true).
-		Padding(0, 2)
+			Foreground(lipgloss.Color(colDim)).
+			Italic(true).
+			Padding(0, 2)
 
 	// ── confirm dialog ───────────────────────────────────────────────────
 	sConfirmTitle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(colError)).
-		Bold(true).
-		Padding(0, 2)
+			Foreground(lipgloss.Color(colError)).
+			Bold(true).
+			Padding(0, 2)
 
 	sConfirmBody = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(colText)).
-		Padding(0, 2)
+			Foreground(lipgloss.Color(colText)).
+			Padding(0, 2)
 
 	// ── help view ────────────────────────────────────────────────────────
 	sHelpTitle = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(colText)).
-		Bold(true).
-		Padding(0, 2)
+			Foreground(lipgloss.Color(colText)).
+			Bold(true).
+			Padding(0, 2)
 
 	sHelpSection = lipgloss.NewStyle().
-		Foreground(lipgloss.Color(colAccent)).
-		Padding(0, 4)
+			Foreground(lipgloss.Color(colAccent)).
+			Padding(0, 4)
 
 	sHelpKey  = lipgloss.NewStyle().Foreground(lipgloss.Color(colText)).Bold(true)
 	sHelpDesc = lipgloss.NewStyle().Foreground(lipgloss.Color(colDim))

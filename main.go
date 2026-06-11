@@ -8,15 +8,14 @@ import (
 
 	"github.com/d3uceY/Ya-CLI/tui"
 	"github.com/d3uceY/Ya-CLI/utils"
-	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
 func main() {
 
-	// colored output
-	green := color.New(color.FgGreen).SprintFunc()
-	yellow := color.New(color.FgYellow).SprintFunc()
+	// colored output — uses TUI palette via lipgloss
+	accent := utils.CAccent.Render
+	success := utils.CSuccess.Render
 
 	// completion function — reads shortcut names from storage and returns them for shell tab-completion
 	shortcutCompletions := func(cmd *cobra.Command, args []string, toComplete string) ([]string, cobra.ShellCompDirective) {
@@ -53,14 +52,14 @@ func main() {
 
 			shortcuts, err := utils.LoadShortcuts()
 			if err != nil {
-				color.Red("Error loading shortcuts: %v", err)
+				utils.PrintError("Error loading shortcuts: %v", err)
 				os.Exit(1)
 			}
 
 			command, exists := shortcuts[shortcut]
 
 			if !exists {
-				fmt.Printf("Unknown shortcut: %s\n to add a new shortcut use: ya add <shortcut> '<command>'", yellow(shortcut))
+				fmt.Printf("Unknown shortcut: %s\n to add a new shortcut use: ya add <shortcut> '<command>'", accent(shortcut))
 				os.Exit(1)
 			}
 
@@ -68,7 +67,7 @@ func main() {
 			var templateErr error
 			command, templateErr = utils.ResolveTemplates(command)
 			if templateErr != nil {
-				color.Red("Template error: %v", templateErr)
+				utils.PrintError("Template error: %v", templateErr)
 				os.Exit(1)
 			}
 
@@ -103,7 +102,7 @@ func main() {
 
 			cmdError := execCmd.Run()
 			if cmdError != nil {
-				color.Red("Command failed: %v", cmdError)
+				utils.PrintError("Command failed: %v", cmdError)
 				os.Exit(1)
 			}
 		},
@@ -118,7 +117,7 @@ func main() {
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
 			version := utils.GetAppVersion()
-			color.Green("Ya version: %s", version)
+			utils.PrintSuccess("Ya version: %s", version)
 		},
 	}
 
@@ -131,14 +130,14 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			shortcuts, err := utils.LoadShortcuts()
 			if err != nil {
-				color.Red("Error loading shortcuts: %v", err)
+				utils.PrintError("Error loading shortcuts: %v", err)
 				os.Exit(1)
 			}
-			color.Green("Available shortcuts:")
+			utils.PrintSuccess("Available shortcuts:")
 			for key, command := range shortcuts {
-				fmt.Printf("- %s : %s\n", yellow(key), green(command))
+				fmt.Printf("- %s : %s\n", accent(key), success(command))
 			}
-			fmt.Printf("\n%s\n", yellow(fmt.Sprintf("%d shortcut(s)", len(shortcuts))))
+			fmt.Printf("\n%s\n", utils.CDim.Render(fmt.Sprintf("%d shortcut(s)", len(shortcuts))))
 		},
 	}
 
@@ -149,20 +148,22 @@ func main() {
 		Aliases: []string{"--help", "-h"},
 		Args:    cobra.NoArgs,
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("\n--- Ya Usage ---")
+			fmt.Println("\n" + utils.CAccent.Bold(true).Render("ya") + utils.CDim.Render("  usage"))
+			fmt.Println()
 
-			fmt.Printf("%s %s\n", yellow("To add a new shortcut use:"), green("ya add <shortcut> <command>"))
-			fmt.Printf("%s %s\n", yellow("To remove a shortcut use:"), green("ya remove <shortcut>"))
-			fmt.Printf("%s %s\n", yellow("To list all shortcuts:"), green("ya list"))
-			fmt.Printf("%s %s\n", yellow("To show version:"), green("ya version"))
-			fmt.Printf("%s %s\n", yellow("To import shortcuts use:"), green("ya import <file-path>"))
-			fmt.Printf("%s %s\n", yellow("To export shortcuts use:"), green("ya export <dir> [--name <filename>]"))
-			fmt.Printf("%s %s\n", yellow("To search shortcuts use:"), green("ya search <shortcut>"))
-			fmt.Printf("%s %s\n", yellow("To show a shortcut use:"), green("ya show <shortcut>"))
-			fmt.Printf("%s %s\n", yellow("To run a shortcut use:"), green("ya <shortcut> [extra args...]"))
-			fmt.Printf("%s %s\n", yellow("To use template values in a command:"), green("ya add commit 'git commit -m {message}'"))
+			fmt.Printf("%s %s\n", utils.CDim.Render("To add a new shortcut use:"), accent("ya add <shortcut> <command>"))
+			fmt.Printf("%s %s\n", utils.CDim.Render("To remove a shortcut use:"), accent("ya remove <shortcut>"))
+			fmt.Printf("%s %s\n", utils.CDim.Render("To list all shortcuts:"), accent("ya list"))
+			fmt.Printf("%s %s\n", utils.CDim.Render("To show version:"), accent("ya version"))
+			fmt.Printf("%s %s\n", utils.CDim.Render("To import shortcuts use:"), accent("ya import <file-path>"))
+			fmt.Printf("%s %s\n", utils.CDim.Render("To export shortcuts use:"), accent("ya export <dir> [--name <filename>]"))
+			fmt.Printf("%s %s\n", utils.CDim.Render("To search shortcuts use:"), accent("ya search <shortcut>"))
+			fmt.Printf("%s %s\n", utils.CDim.Render("To show a shortcut use:"), accent("ya show <shortcut>"))
+			fmt.Printf("%s %s\n", utils.CDim.Render("To run a shortcut use:"), accent("ya <shortcut> [extra args...]"))
+			fmt.Printf("%s %s\n", utils.CDim.Render("To use template values in a command:"), accent("ya add commit 'git commit -m {message}'"))
 
-			fmt.Printf("%s %s\n", yellow("To enable shell autocomplete:"), green("ya completion <shell>   (see README for setup: https://github.com/d3uceY/Ya-CLI#shell-tab-completion)"))
+			fmt.Printf("%s %s\n", utils.CDim.Render("To enable shell autocomplete:"), accent("ya completion <shell>"))
+			fmt.Printf("%s\n", utils.CDim.Render("  (see README: https://github.com/d3uceY/Ya-CLI#shell-tab-completion)"))
 
 			fmt.Println()
 		},
@@ -178,17 +179,16 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			shortcuts, err := utils.SearchShortcut(args[0])
 			if err != nil {
-				color.Red(err.Error())
+				utils.PrintError("%s", err.Error())
 			}
 			if !(len(shortcuts) >= 1) {
-				color.Red("Shortcuts with `%s` not found", args[0])
+				utils.PrintError("Shortcuts with `%s` not found", args[0])
 			}
-			color.Green("Search results:")
+			utils.PrintSuccess("Search results:")
 			for key, command := range shortcuts {
-				color.Yellow(" - %s :", key)
-				color.Green(" %s", command)
+				fmt.Printf(" - %s : %s\n", accent(key), success(command))
 			}
-			fmt.Printf("\n%s\n", yellow(fmt.Sprintf("%d shortcut(s)", len(shortcuts))))
+			fmt.Printf("\n%s\n", utils.CDim.Render(fmt.Sprintf("%d shortcut(s)", len(shortcuts))))
 		},
 	}
 
@@ -201,10 +201,10 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			command, err := utils.GetShortcut(args[0])
 			if err != nil {
-				color.Red(err.Error())
+				utils.PrintError("%s", err.Error())
 				os.Exit(1)
 			}
-			fmt.Printf("Shortcut `%s` maps to command: %s\n", yellow(args[0]), green(command))
+			fmt.Printf("Shortcut `%s` maps to command: %s\n", accent(args[0]), success(command))
 		},
 	}
 
@@ -217,18 +217,18 @@ func main() {
 			shortcutName := args[0]
 			command := args[1]
 			if utils.IsInvalidString(shortcutName) || utils.IsInvalidString(command) {
-				color.Red("Usage: ya add <shortcut> '<command>'")
+				utils.PrintError("Usage: ya add <shortcut> '<command>'")
 				os.Exit(1)
 			}
 
 			existing, err := utils.GetShortcut(shortcutName)
 			if err == nil {
-				fmt.Printf("Shortcut %s already exists: %s\n", yellow(shortcutName), green(existing))
+				fmt.Printf("Shortcut %s already exists: %s\n", accent(shortcutName), success(existing))
 				fmt.Printf("Overwrite? [y/N]: ")
 				var input string
 				fmt.Scanln(&input)
 				if input != "y" && input != "Y" {
-					color.Yellow("Aborted.")
+					utils.PrintDim("Aborted.")
 					return
 				}
 			}
@@ -245,10 +245,10 @@ func main() {
 		Run: func(cmd *cobra.Command, args []string) {
 			err := utils.ImportShortcuts(args[0])
 			if err != nil {
-				color.Red(err.Error())
+				utils.PrintError("%s", err.Error())
 				os.Exit(1)
 			}
-			color.Green("Shortcut Imported `%s`", args[0])
+			utils.PrintSuccess("Shortcut Imported `%s`", args[0])
 		},
 	}
 
@@ -264,10 +264,10 @@ func main() {
 			filePath := args[0] + "/" + exportName
 			err := utils.ExportShortcuts(filePath)
 			if err != nil {
-				color.Red(err.Error())
+				utils.PrintError("%s", err.Error())
 				os.Exit(1)
 			}
-			color.Green("Shortcuts exported to `%s`", filePath)
+			utils.PrintSuccess("Shortcuts exported to `%s`", filePath)
 		},
 	}
 	// --name flag to set the output filename, defaults to shortcuts.json
@@ -283,16 +283,16 @@ func main() {
 			shortcutName := args[0]
 			existing, err := utils.GetShortcut(shortcutName)
 			if err != nil {
-				color.Red(err.Error())
+				utils.PrintError("%s", err.Error())
 				os.Exit(1)
 			}
 
-			fmt.Printf("This will remove the shortcut %s: %s\n", yellow(shortcutName), green(existing))
+			fmt.Printf("This will remove the shortcut %s: %s\n", accent(shortcutName), success(existing))
 			fmt.Printf("Are you sure? [y/N]: ")
 			var input string
 			fmt.Scanln(&input)
 			if input != "y" && input != "Y" {
-				color.Yellow("Aborted.")
+				utils.PrintDim("Aborted.")
 				return
 			}
 			utils.RemoveShortcut(args[0])
@@ -309,25 +309,25 @@ func main() {
 			newName := args[1]
 			existing, err := utils.GetShortcut(shortcutName)
 			if err != nil {
-				color.Red(err.Error())
+				utils.PrintError("%s", err.Error())
 				os.Exit(1)
 			}
 
-			fmt.Printf("This will rename the shortcut %s: %s to %s\n", yellow(shortcutName), green(existing), yellow(newName))
+			fmt.Printf("This will rename the shortcut %s: %s to %s\n", accent(shortcutName), success(existing), accent(newName))
 			fmt.Printf("Are you sure? [y/N]: ")
 			var input string
 			fmt.Scanln(&input)
 			if input != "y" && input != "Y" {
-				color.Yellow("Aborted.")
+				utils.PrintDim("Aborted.")
 				return
 			}
 
 			err = utils.RenameShortcut(shortcutName, newName)
 			if err != nil {
-				color.Red(err.Error())
+				utils.PrintError("%s", err.Error())
 				os.Exit(1)
 			}
-			color.Green("Renamed `%s` to `%s`", shortcutName, newName)
+			utils.PrintSuccess("Renamed `%s` to `%s`", shortcutName, newName)
 		},
 	}
 

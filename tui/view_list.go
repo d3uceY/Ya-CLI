@@ -23,6 +23,13 @@ func (m Model) viewList() string {
 	visible := m.visibleRows()
 	nameWidth := m.calcNameColWidth()
 
+	// If the selected row has a description sub-line, reserve one extra line.
+	selHasDesc := m.selectedKey() != "" && m.shortcuts[m.selectedKey()].Description != ""
+	effective := visible
+	if selHasDesc {
+		effective--
+	}
+
 	if len(m.filtered) == 0 {
 		var emptyMsg string
 		if m.searchInput.Value() != "" {
@@ -38,7 +45,7 @@ func (m Model) viewList() string {
 			b.WriteByte('\n')
 		}
 	} else {
-		end := m.offset + visible
+		end := m.offset + effective
 		if end > len(m.filtered) {
 			end = len(m.filtered)
 		}
@@ -47,8 +54,16 @@ func (m Model) viewList() string {
 			k := m.filtered[i]
 			b.WriteString(m.renderRow(k, i == m.cursor, nameWidth))
 			b.WriteByte('\n')
+			if i == m.cursor && selHasDesc {
+				b.WriteString(m.renderDescLine(nameWidth))
+				b.WriteByte('\n')
+			}
 		}
-		for i := shown; i < visible; i++ {
+		used := shown
+		if selHasDesc {
+			used++
+		}
+		for i := used; i < visible; i++ {
 			b.WriteByte('\n')
 		}
 	}
@@ -100,7 +115,7 @@ func (m Model) calcNameColWidth() int {
 	return w + 2
 }
 
-// renderRow renders a single shortcut row with optional description.
+// renderRow renders a single shortcut row (name + command only).
 func (m Model) renderRow(name string, selected bool, nameColWidth int) string {
 	s := m.shortcuts[name]
 	const prefixLen = 6
@@ -109,18 +124,7 @@ func (m Model) renderRow(name string, selected bool, nameColWidth int) string {
 		cmdColWidth = 10
 	}
 
-	// If there's a description, split the cmd col to show it.
-	var cmdPart, descPart string
-	if s.Description != "" && cmdColWidth > 20 {
-		half := cmdColWidth * 2 / 3
-		cmdPart = truncateStr(s.Command, half)
-		remaining := cmdColWidth - half - 3
-		if remaining > 0 {
-			descPart = truncateStr(s.Description, remaining)
-		}
-	} else {
-		cmdPart = truncateStr(s.Command, cmdColWidth)
-	}
+	cmdPart := truncateStr(s.Command, cmdColWidth)
 
 	pinMark := ""
 	if s.Pinned {
@@ -132,19 +136,26 @@ func (m Model) renderRow(name string, selected bool, nameColWidth int) string {
 		prefix = "  " + sAccent.Render("❯") + "  "
 		nameStr = sNameSelected.Render(padRight(name, nameColWidth))
 		cmdStr = pinMark + renderCommandWithTokens(cmdPart, sCmdSelected)
-		if descPart != "" {
-			cmdStr += sDim.Render("  "+descPart)
-		}
 	} else {
 		prefix = "     "
 		nameStr = sName.Render(padRight(name, nameColWidth))
 		cmdStr = pinMark + renderCommandWithTokens(cmdPart, sCmd)
-		if descPart != "" {
-			cmdStr += sDim.Render("  "+descPart)
-		}
 	}
 
 	return prefix + nameStr + "  " + cmdStr
+}
+
+// renderDescLine renders the description sub-line for the selected shortcut.
+func (m Model) renderDescLine(nameColWidth int) string {
+	s := m.shortcuts[m.selectedKey()]
+	const prefixLen = 6
+	indent := strings.Repeat(" ", prefixLen+nameColWidth+2)
+	availW := m.width - prefixLen - nameColWidth - 2
+	if availW < 10 {
+		return ""
+	}
+	desc := truncateStr(s.Description, availW-2)
+	return indent + sDescLine.Width(availW).Render(" "+desc)
 }
 
 // blankRow is kept for interface compatibility.
@@ -182,5 +193,3 @@ func (m Model) renderListFooterContent() string {
 		keyHint("q", "quit"),
 	)
 }
-
-

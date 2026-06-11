@@ -7,8 +7,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-
-	"github.com/fatih/color"
 )
 
 func GetAppVersion() string {
@@ -47,9 +45,9 @@ func ResolveTemplates(command string) (string, error) {
 		}
 	}
 
-	cyan := color.New(color.FgCyan).SprintFunc()
-	yellow := color.New(color.FgYellow).SprintFunc()
-	green := color.New(color.FgGreen).SprintFunc()
+	cyan := CAccent.Render
+	yellow := CAccent.Render
+	green := CSuccess.Render
 
 	fmt.Printf("%s %s\n", cyan("→"), yellow("This command has template values. Fill them in below:"))
 	fmt.Println()
