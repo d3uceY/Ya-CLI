@@ -1,0 +1,23 @@
+/* Ya — accent colour matches the TUI cadet blue (#5F9EA0) */
+:root {
+  --ifm-color-primary: #4a8c8e;
+  --ifm-color-primary-dark: #3f7c7e;
+  --ifm-color-primary-darker: #3b7577;
+  --ifm-color-primary-darkest: #306163;
+  --ifm-color-primary-light: #559c9e;
+  --ifm-color-primary-lighter: #5aa3a5;
+  --ifm-color-primary-lightest: #6eb4b6;
+  --ifm-code-font-size: 95%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #5F9EA0;
+  --ifm-color-primary-dark: #549092;
+  --ifm-color-primary-darker: #4f898b;
+  --ifm-color-primary-darkest: #3f7072;
+  --ifm-color-primary-light: #6aacae;
+  --ifm-color-primary-lighter: #6fb1b3;
+  --ifm-color-primary-lightest: #82c0c2;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+}
